@@ -1,0 +1,36 @@
+# Unity generated files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+
+# Visual Studio Code settings
+.vscode/
+
+# Rider settings
+.idea/
+
+# Unity Asset Store tools
+Assets/AssetStoreTools*
+
+# Crash logs
+CrashReports/
+
+# VS files
+.vs/
+
+# Package files
+Packages/com.unity.package-manager-ui/
