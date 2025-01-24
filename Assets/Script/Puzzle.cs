@@ -1,6 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; // For accessing UI components
+using TMPro;  // Add this at the top for TextMeshPro
+
+
 
 public class Puzzle : MonoBehaviour
 {
@@ -8,8 +12,18 @@ public class Puzzle : MonoBehaviour
     [SerializeField] private Transform piecePrefab;
     [SerializeField] private AudioSource audioSource; // Reference to AudioSource
     [SerializeField] private AudioClip completionClip; // Sound for game completion
+
+    [SerializeField] private AudioClip moveClip; // Sound for game move
     [SerializeField] private AudioClip gameOverClip;   // Sound for game over
-    [SerializeField] private int maxTrials = 20; // Maximum number of trials
+    [SerializeField] private TMP_Text movesText; // Reference to the TextMeshPro Text UI
+    [SerializeField] private TMP_Text successText; // Reference to the TextMeshPro Text UI
+
+    [SerializeField] private TMP_Text gameOverText; // Reference to the TextMeshPro Text for "Game Over"
+    [SerializeField] private Button tryAgainButton; // Reference to the Try Again Button
+
+
+    public TMP_Dropdown difficultyDropdown;
+    [SerializeField] private int maxTrials = 30; // Maximum number of trials
 
     private int emptyLocation;
     private int size; // Grid size (3x3, 5x5, or 6x6)
@@ -18,6 +32,7 @@ public class Puzzle : MonoBehaviour
 
     private List<Transform> pieces = new List<Transform>();
 
+<<<<<<< Updated upstream
     // Method to change puzzle size (Easy, Medium, or Hard)
     public void SetPuzzleSize(int newSize)
     {
@@ -25,10 +40,32 @@ public class Puzzle : MonoBehaviour
         trials = 0; // Reset the trial count when the size changes
         pieces.Clear(); // Clear existing pieces
         CreatePieces(0.01f); // Recreate the pieces with the new size
+=======
+    public void SetPuzzleSize(int newSize)
+    {
+        Debug.Log($"Setting puzzle size to: {newSize}");  // Debug to check the size
+        size = newSize;  // Update the puzzle size
+
+        // Reset puzzle state to reinitialize with the new size
+        ResetPuzzle();
+        CreatePieces(0.01f);  // Recreate the pieces based on the new size
+
+        trials = 0; // Reset moves to 0
+        UpdateMovesText(); // Update the move count in the UI
+
+        Shuffle(); // Shuffle the pieces after resizing
+>>>>>>> Stashed changes
     }
 
     void CreatePieces(float gapThickness)
     {
+        // Clear existing pieces before creating new ones
+        foreach (var piece in pieces)
+        {
+            Destroy(piece.gameObject);
+        }
+        pieces.Clear();
+
         float width = 1f / size;
 
         for (int row = 0; row < size; row++)
@@ -70,6 +107,50 @@ public class Puzzle : MonoBehaviour
         }
     }
 
+<<<<<<< Updated upstream
+=======
+    private void Shuffle()
+    {
+        int count = 0;
+        int last = 0;
+        while (count < (size * size * size))
+        {
+            int rnd = Random.Range(0, size * size);
+            if (rnd == last) { continue; }
+            last = emptyLocation;
+
+            if (SwapIfValid(rnd, -size, size)) { count++; }
+            else if (SwapIfValid(rnd, +size, size)) { count++; }
+            else if (SwapIfValid(rnd, -1, 0)) { count++; }
+            else if (SwapIfValid(rnd, +1, size - 1)) { count++; }
+        }
+    }
+
+    private void ResetPuzzle()
+    {
+        // Hide success text
+        successText.gameObject.SetActive(false);
+
+        // Reset pieces to initial state, e.g., hide last piece
+        for (int i = 0; i < pieces.Count; i++)
+        {
+            if (i == emptyLocation)
+            {
+                pieces[i].gameObject.SetActive(false); // Hide the empty piece
+            }
+            else
+            {
+                pieces[i].gameObject.SetActive(true); // Show all other pieces
+            }
+        }
+
+        // Reset move count and update text
+        trials = 0;
+        UpdateMovesText();
+    }
+
+
+>>>>>>> Stashed changes
 
     void Start()
     {
@@ -95,7 +176,45 @@ public class Puzzle : MonoBehaviour
 
         // Initialize the puzzle with the selected grid size
         pieces = new List<Transform>();
+<<<<<<< Updated upstream
         CreatePieces(0.01f); // Recreate the pieces with the new size
+=======
+        size = 3; // Default grid size is 3x3
+        CreatePieces(0.01f);
+        UpdateMovesText(); // Initialize moves text
+
+        // Hide the "Game Over" text and try again button initially
+        gameOverText.gameObject.SetActive(false);
+        tryAgainButton.gameObject.SetActive(false);
+
+        // Add listener for the Try Again button
+        tryAgainButton.onClick.AddListener(RestartGame);
+
+        // Add listener for difficulty dropdown to change the puzzle size
+        difficultyDropdown.onValueChanged.AddListener(SetPuzzleSizeFromDropdown);
+    }
+
+    public void SetPuzzleSizeFromDropdown(int index)
+    {
+        // You can assign different sizes based on the index of the dropdown
+        switch (index)
+        {
+            case 0: // Easy: 3x3
+                SetPuzzleSize(3);
+                maxTrials = 30;
+                break;
+            case 1: // Medium: 4x4
+                SetPuzzleSize(4);
+                maxTrials = 40;
+                break;
+            case 2: // Hard: 5x5
+                SetPuzzleSize(5);
+                maxTrials = 50;
+
+                break;
+                // Add more cases for other difficulties if needed
+        }
+>>>>>>> Stashed changes
     }
 
     void Update()
@@ -116,6 +235,7 @@ public class Puzzle : MonoBehaviour
                     }
                 }
                 trials++; // Increment the trial count
+                UpdateMovesText(); // Update the UI text
                 CheckGameOver(); // Check if game over condition is met
             }
         }
@@ -129,6 +249,14 @@ public class Puzzle : MonoBehaviour
         }
     }
 
+    private void UpdateMovesText()
+    {
+        if (movesText != null)
+        {
+            movesText.text = $"Moves: {trials}"; // Update the text to show the number of moves
+        }
+    }
+
     private bool CheckCompletion()
     {
         for (int i = 0; i < pieces.Count; i++)
@@ -138,19 +266,26 @@ public class Puzzle : MonoBehaviour
                 return false;
             }
         }
+
+        successText.gameObject.SetActive(true);
         return true;
     }
 
-    private void CheckGameOver()
+    void CheckGameOver()
     {
         if (trials >= maxTrials)
         {
             PlayAudio(gameOverClip); // Play game over sound
             Debug.Log("Game Over! You have exceeded the maximum number of trials.");
-            // Optionally, restart or end the game here
+
+            // Show the game over text and the try again button
+            gameOverText.gameObject.SetActive(true);
+            tryAgainButton.gameObject.SetActive(true);
+
+            // Optionally, stop the game or disable further interactions
+            Time.timeScale = 0f; // Pause the game
         }
     }
-
     private void PlayAudio(AudioClip clip)
     {
         if (audioSource != null && clip != null)
@@ -163,25 +298,31 @@ public class Puzzle : MonoBehaviour
     {
         yield return new WaitForSeconds(duration);
         Shuffle();
+        ResetPuzzle();
         shuffling = false;
     }
-
-    private void Shuffle()
+    public void RestartGame()
     {
-        int count = 0;
-        int last = 0;
-        while (count < (size * size * size))
+        // Null checks for critical objects
+        if (gameOverText != null && tryAgainButton != null)
         {
-            int rnd = Random.Range(0, size * size);
-            if (rnd == last) { continue; }
-            last = emptyLocation;
+            // Reset the game
+            Time.timeScale = 1f; // Resume the game
+            gameOverText.gameObject.SetActive(false); // Hide the game over text
+            tryAgainButton.gameObject.SetActive(false); // Hide the try again button
 
-            if (SwapIfValid(rnd, -size, size)) { count++; }
-            else if (SwapIfValid(rnd, +size, size)) { count++; }
-            else if (SwapIfValid(rnd, -1, 0)) { count++; }
-            else if (SwapIfValid(rnd, +1, size - 1)) { count++; }
+            // Reset the puzzle
+            ResetPuzzle();
+            trials = 0; // Reset the trials count
+            UpdateMovesText(); // Update moves text to 0
+        }
+        else
+        {
+            Debug.LogError("gameOverText or tryAgainButton is not assigned in the Inspector.");
         }
     }
+
+
 
     private bool SwapIfValid(int i, int offset, int colCheck)
     {
@@ -192,8 +333,15 @@ public class Puzzle : MonoBehaviour
                 (pieces[i + offset].localPosition, pieces[i].localPosition);
 
             emptyLocation = i;
+
+            // Play audio when a valid swap occurs
+            PlayAudio(moveClip); // This is just an example; replace with your specific sound for moving tiles.
+
             return true;
         }
         return false;
     }
+
+
+
 }
