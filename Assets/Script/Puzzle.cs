@@ -12,11 +12,20 @@ public class Puzzle : MonoBehaviour
     [SerializeField] private int maxTrials = 20; // Maximum number of trials
 
     private int emptyLocation;
-    private int size;
+    private int size; // Grid size (3x3, 5x5, or 6x6)
     private int trials = 0; // Count the number of trials
     private bool shuffling = false;
 
     private List<Transform> pieces = new List<Transform>();
+
+    // Method to change puzzle size (Easy, Medium, or Hard)
+    public void SetPuzzleSize(int newSize)
+    {
+        size = newSize;
+        trials = 0; // Reset the trial count when the size changes
+        pieces.Clear(); // Clear existing pieces
+        CreatePieces(0.01f); // Recreate the pieces with the new size
+    }
 
     void CreatePieces(float gapThickness)
     {
@@ -55,17 +64,38 @@ public class Puzzle : MonoBehaviour
                 if (row == size - 1 && col == size - 1)
                 {
                     emptyLocation = (size * size) - 1;
-                    piece.gameObject.SetActive(false);
+                    piece.gameObject.SetActive(false); // Hide the last piece
                 }
             }
         }
     }
 
+
     void Start()
     {
+        string selectedDifficulty = DifficultyManager.selectedDifficulty;
+
+        // Set the grid size based on selected difficulty.
+        if (selectedDifficulty == "easy")
+        {
+            size = 3; // Easy: 3x3 grid
+        }
+        else if (selectedDifficulty == "medium")
+        {
+            size = 4; // Medium: 4x4 grid
+        }
+        else if (selectedDifficulty == "hard")
+        {
+            size = 5; // Hard: 5x5 grid
+        }
+        else
+        {
+            size = 3; // Default to easy if no valid selection
+        }
+
+        // Initialize the puzzle with the selected grid size
         pieces = new List<Transform>();
-        size = 3; // Grid size is 3x3
-        CreatePieces(0.01f);
+        CreatePieces(0.01f); // Recreate the pieces with the new size
     }
 
     void Update()
