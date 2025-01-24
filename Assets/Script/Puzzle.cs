@@ -26,24 +26,12 @@ public class Puzzle : MonoBehaviour
     [SerializeField] private int maxTrials = 30; // Maximum number of trials
 
     private int emptyLocation;
-    private int size; // Grid size (3x3, 5x5, or 6x6)
+    private int size;
     private int trials = 0; // Count the number of trials
     private bool shuffling = false;
 
     private List<Transform> pieces = new List<Transform>();
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    // Method to change puzzle size (Easy, Medium, or Hard)
-    public void SetPuzzleSize(int newSize)
-    {
-        size = newSize;
-        trials = 0; // Reset the trial count when the size changes
-        pieces.Clear(); // Clear existing pieces
-        CreatePieces(0.01f); // Recreate the pieces with the new size
-=======
-=======
->>>>>>> Stashed changes
     public void SetPuzzleSize(int newSize)
     {
         Debug.Log($"Setting puzzle size to: {newSize}");  // Debug to check the size
@@ -57,10 +45,6 @@ public class Puzzle : MonoBehaviour
         UpdateMovesText(); // Update the move count in the UI
 
         Shuffle(); // Shuffle the pieces after resizing
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     }
 
     void CreatePieces(float gapThickness)
@@ -107,17 +91,12 @@ public class Puzzle : MonoBehaviour
                 if (row == size - 1 && col == size - 1)
                 {
                     emptyLocation = (size * size) - 1;
-                    piece.gameObject.SetActive(false); // Hide the last piece
+                    piece.gameObject.SetActive(false);
                 }
             }
         }
     }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
     private void Shuffle()
     {
         int count = 0;
@@ -159,41 +138,10 @@ public class Puzzle : MonoBehaviour
     }
 
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
     void Start()
     {
-        string selectedDifficulty = DifficultyManager.selectedDifficulty;
-
-        // Set the grid size based on selected difficulty.
-        if (selectedDifficulty == "easy")
-        {
-            size = 3; // Easy: 3x3 grid
-        }
-        else if (selectedDifficulty == "medium")
-        {
-            size = 4; // Medium: 4x4 grid
-        }
-        else if (selectedDifficulty == "hard")
-        {
-            size = 5; // Hard: 5x5 grid
-        }
-        else
-        {
-            size = 3; // Default to easy if no valid selection
-        }
-
-        // Initialize the puzzle with the selected grid size
         pieces = new List<Transform>();
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        CreatePieces(0.01f); // Recreate the pieces with the new size
-=======
-=======
->>>>>>> Stashed changes
         size = 3; // Default grid size is 3x3
         CreatePieces(0.01f);
         UpdateMovesText(); // Initialize moves text
@@ -229,10 +177,6 @@ public class Puzzle : MonoBehaviour
                 break;
                 // Add more cases for other difficulties if needed
         }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     }
 
     void Update()
