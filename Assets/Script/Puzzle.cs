@@ -18,12 +18,18 @@ public class Puzzle : MonoBehaviour
     [SerializeField] private TMP_Text movesText; // Reference to the TextMeshPro Text UI
     [SerializeField] private TMP_Text successText; // Reference to the TextMeshPro Text UI
 
+    [SerializeField] private Image uiImage;
+    [SerializeField] private Image uiImage_2;
+
+
     [SerializeField] private TMP_Text gameOverText; // Reference to the TextMeshPro Text for "Game Over"
     [SerializeField] private Button tryAgainButton; // Reference to the Try Again Button
 
 
+
+
     public TMP_Dropdown difficultyDropdown;
-    [SerializeField] private int maxTrials = 30; // Maximum number of trials
+    [SerializeField] private int maxTrials = 35; // Maximum number of trials
 
     private int emptyLocation;
     private int size;
@@ -118,6 +124,7 @@ public class Puzzle : MonoBehaviour
     {
         // Hide success text
         successText.gameObject.SetActive(false);
+        uiImage.gameObject.SetActive(false);
 
         // Reset pieces to initial state, e.g., hide last piece
         for (int i = 0; i < pieces.Count; i++)
@@ -149,6 +156,7 @@ public class Puzzle : MonoBehaviour
         // Hide the "Game Over" text and try again button initially
         gameOverText.gameObject.SetActive(false);
         tryAgainButton.gameObject.SetActive(false);
+        uiImage_2.gameObject.SetActive(false);
 
         // Add listener for the Try Again button
         tryAgainButton.onClick.AddListener(RestartGame);
@@ -163,17 +171,18 @@ public class Puzzle : MonoBehaviour
         switch (index)
         {
             case 0: // Easy: 3x3
+                maxTrials = 35;
                 SetPuzzleSize(3);
-                maxTrials = 30;
+
                 break;
             case 1: // Medium: 4x4
-                SetPuzzleSize(4);
                 maxTrials = 40;
+                SetPuzzleSize(4);
+
                 break;
             case 2: // Hard: 5x5
-                SetPuzzleSize(5);
                 maxTrials = 50;
-
+                SetPuzzleSize(5);
                 break;
                 // Add more cases for other difficulties if needed
         }
@@ -215,7 +224,7 @@ public class Puzzle : MonoBehaviour
     {
         if (movesText != null)
         {
-            movesText.text = $"Moves: {trials}"; // Update the text to show the number of moves
+            movesText.text = $"Moves: {trials}/{maxTrials}"; //m Update the text to show the number of moves
         }
     }
 
@@ -230,7 +239,22 @@ public class Puzzle : MonoBehaviour
         }
 
         successText.gameObject.SetActive(true);
+        uiImage.gameObject.SetActive(true);
+
+        // Start the coroutine to wait for a specified time
+        StartCoroutine(ShowSuccessForTime(9f)); 
+
         return true;
+    }
+
+    private IEnumerator ShowSuccessForTime(float duration)
+    {
+        // Wait for the specified time in real-time (independent of Time.timeScale)
+        yield return new WaitForSecondsRealtime(duration);
+
+        // After the wait, hide the success text and image
+        successText.gameObject.SetActive(false);
+        uiImage.gameObject.SetActive(false);
     }
 
     void CheckGameOver()
@@ -243,6 +267,9 @@ public class Puzzle : MonoBehaviour
             // Show the game over text and the try again button
             gameOverText.gameObject.SetActive(true);
             tryAgainButton.gameObject.SetActive(true);
+            uiImage_2.gameObject.SetActive(true);
+
+
 
             // Optionally, stop the game or disable further interactions
             Time.timeScale = 0f; // Pause the game
@@ -272,11 +299,15 @@ public class Puzzle : MonoBehaviour
             Time.timeScale = 1f; // Resume the game
             gameOverText.gameObject.SetActive(false); // Hide the game over text
             tryAgainButton.gameObject.SetActive(false); // Hide the try again button
+            uiImage_2.gameObject.SetActive(false);
+
 
             // Reset the puzzle
             ResetPuzzle();
+            Shuffle();
             trials = 0; // Reset the trials count
             UpdateMovesText(); // Update moves text to 0
+
         }
         else
         {
